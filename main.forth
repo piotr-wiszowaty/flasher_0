@@ -1,9 +1,19 @@
-#include io.forth
+: phex2. ( c -- )
+  hex 0 <# # # #> type space ;
 
 : main ( -- )
   vdd-on
-  begin
-  key? until
+  50 ms
+  data-in
+  16 0 do
+    cr
+    16 0 do
+      j 4 lshift i + set-address
+      ce-low oe-low
+      get-data phex2.
+      oe-high ce-high
+    loop
+  loop
   vdd-off ;
 
 : setup ( -- )
@@ -14,5 +24,6 @@
   ce-low
   oe-low
   we-low
-  \ TODO: timer
-  ;
+  tim14-init ;
+
+: m setup main ;

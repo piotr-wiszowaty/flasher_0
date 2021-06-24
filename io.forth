@@ -40,7 +40,7 @@
 
 \ set data bus to output
 : data-out ( -- )
-  GPIOA_MODER @ $00005555 or GPIOA_MODER ! ;
+  $5555 GPIOA_MODER bis! ;
 
 \ set data bus to input
 : data-in ( -- )
