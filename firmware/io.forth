@@ -8,6 +8,11 @@
 \ #CE     - PF6
 \ #VDD    - PF7
 
+\ 00: Input mode (reset state)
+\ 01: General purpose output mode
+\ 10: Alternate function mode
+\ 11: Analog mode
+
 : setup-io ( -- )
   GPIOA_MODER @ $3C3CFFFF and $41410000 or GPIOA_MODER !
   $55555555 GPIOB_MODER !
@@ -48,15 +53,17 @@
 
 : set-address ( a -- )
   dup
-  $FFFF and GPIOB_ODR !                           \ A0..A15
-  dup $10000 and if $0800 else $08000000 then     \ A16
-  dup $20000 and if $1000 else $10000000 then or  \ A17
-      $40000 and if $8000 else $80000000 then or  \ A18
+  $FFFF and GPIOB_ODR !                            \ A0..A15
+  dup  $10000 and if $0800 else $08000000 then     \ A16
+  over $20000 and if $1000 else $10000000 then or  \ A17
+  swap $40000 and if $8000 else $80000000 then or  \ A18
   GPIOA_BSRR ! ;
 
 : set-data ( c -- )
   $FF and
-  GPIOA_ODR @ $FFFFFF00 and or ! ;
+  GPIOA_ODR @ $FFFFFF00 and or GPIOA_ODR ! ;
 
 : get-data ( -- c )
-  GPIOA_IDR @ $FF and ;
+  oe-low
+  GPIOA_IDR @ $FF and
+  oe-high ;
